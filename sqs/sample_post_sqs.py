@@ -4,10 +4,6 @@ sample AWS SQS enqueue an item
 import boto3    # AWS API python module
 import json
 
-# sample exception class used in this sample
-def MyAppException(error):
-    '''raise this when there is an exception in my app'''
-
 # open a connection to the SQS service
 # (using ~/.aws/credentials for access info)
 sqs = boto3.resource('sqs')
@@ -23,6 +19,7 @@ except:
     try:
         queue = sqs.create_queue(QueueName='sample_queue', Attributes={'DelaySeconds': '5'})
     except:
+        # print exception in case sqs could not create the queue
         import sys, traceback, uuid, datetime
         # API is "exc_traceback = sys.exc_info(out exc_type, out exc_value)"
         # next stmt: out parameters come before equal return variable
@@ -33,6 +30,8 @@ except:
         data = {'status': 'E', 'uuid': uniqueErrorId, 'exception': str(e), 'now': datetime.datetime.utcnow()}
         print("Exception caught during SQS.create_queue: '{0}'".format(data))
         sys.exit(0) # forces script exit without a traceback printed
+
+# print queue url for diagnostics
 print(queue.url)
 
     
@@ -41,7 +40,7 @@ try:
     queue.purge()
 except:
     # only purge once every 60 seconds allowed in SQS...
-    pass    # <<== this is a noop stmt in python
+    pass    # <<== this is a noop stmt in python; this will "eat" the exception and continue execution
 
 # format the message to be sent
 msgBody = """
@@ -66,13 +65,14 @@ try:
     queue.send_message(MessageBody=string_msg,
                        MessageAttributes=string_msgAttributes)
 except:
-    import sys, traceback, uuid
+    import sys, traceback, uuid, datetime
     # API is "exc_traceback = sys.exc_info(out exc_type, out exc_value)"
     # next stmt: out parameters come before equal return variable
     exc_type, exc_value, exc_traceback = sys.exc_info()
     e = traceback.format_exception(exc_type, exc_value, exc_traceback)
     e = ''.join(e)
     uniqueErrorId = uuid.uuid4()
-    data = {'status': 'E', 'uuid': uniqueErrorId, 'exception': str(e), 'now': get_tstamp()}
-    print("Exception caught during SQS.send_message: '{0}'".format(data))
+    data = {'status': 'E', 'uuid': uniqueErrorId, 'exception': str(e), 'now': datetime.datetime.utcnow()}
+    print("Exception caught during SQS.create_queue: '{0}'".format(data))
+    sys.exit(0) # forces script exit without a traceback printed
 
