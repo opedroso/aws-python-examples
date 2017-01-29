@@ -43,15 +43,36 @@ $ cd sqs</br>
 
 ### Creates a queue named "sample_queue" and post a single message to it
 
-$ python sample_post_sqs.py</br>
 
+$ python sample_post_sqs.py<br>
+https://queue.amazonaws.com/628650250372/sample_queue<br>
+orignal msg:              "<br>
+{<br>
+    "verb": "SCAN",<br>
+    "TCPIP": "97.80.230.155"<br>
+}<br>
+"<br>
+msg body after json.loads: "{"TCPIP": "97.80.230.155", "verb": "SCAN"}"<br>
 
 ### Read and print the message(s) contained in "sample_queue", deleting the queue once done
 
-$ python sample_receive_sqs.py
+$ python sample_receive_sqs.py<br>
+https://queue.amazonaws.com/628650250372/sample_queue<br>
+Expected message:        "<br>
+{<br>
+    "verb": "SCAN",<br>
+    "TCPIP": "97.80.230.155"<br>
+}<br>
+"<br>
+Expected Msg json.loads: "{'verb': 'SCAN', 'TCPIP': '97.80.230.155'}"<br>
+Expected Msg json.dumps: "{"verb": "SCAN", "TCPIP": "97.80.230.155"}"<br>
+Received msg body:       "{"TCPIP": "97.80.230.155", "verb": "SCAN"}"<br>
+Received body attr:      "{'ApproximateFirstReceiveTimestamp': '1485700808845', 'SentTimestamp': '1485700725029', 'ApproximateReceiveCount': '1', 'SenderId': '628698750372'}"<br>
+Received msg attr:       "{'Author': {'StringValue': 'sample_post_sqs.py', 'DataType': 'String'}}"<br>
+Response msg delete:     "{'ResponseMetadata': {'HTTPStatusCode': 200, 'RequestId': '53816aec-84c0-509a-9330-3be485c87014', 'RetryAttempts': 0, 'HTTPHeaders': {'content-length': '215', 'date': 'Sun, 29 Jan 2017 14:40:08 GMT', 'connection': 'keep-alive', 'x-amzn-requestid': '53816aec-84c0-509a-9330-3be485c87014', 'server': 'Server', 'content-type': 'text/xml'}}}"<br>
+Response queue delete:   "{'ResponseMetadata': {'HTTPStatusCode': 200, 'RequestId': '98ff1549-4265-52da-a042-4441436cb29c', 'RetryAttempts': 0, 'HTTPHeaders': {'content-length': '211', 'date': 'Sun, 29 Jan 2017 14:40:09 GMT', 'connection': 'keep-alive', 'x-amzn-requestid': '98ff1549-4265-52da-a042-4441436cb29c', 'server': 'Server', 'content-type': 'text/xml'}}}"<br>
 
-
-### rerun the post.
+### Rerun the post.
 
 If done within 60 seconds, you will exercise a custom exception handler, since AWS queues cannot be created with the same name within 60 seconds of being deleted.
 
